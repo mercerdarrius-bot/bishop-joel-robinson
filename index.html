@@ -964,12 +964,14 @@ a { color: inherit; text-decoration: none; }
   padding: 24px 28px 28px;
 }
 
-/* Top-pinned date/duration row */
+/* Date/duration row — flows directly under the source badge so it can
+   never collide with it, even if the source label wraps to two lines.
+   (Previously absolutely positioned at top:60px, which overlapped the
+   source badge whenever that badge grew taller than 60px.) */
 .sermon-card-meta {
-  position: absolute;
-  top: 60px;
-  left: 28px;
-  right: 28px;
+  position: relative;
+  margin-top: 8px;
+  padding: 0 24px;
   font-size: 10px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -3688,12 +3690,10 @@ input, select, textarea { font-size: max(16px, 1em); }
         <div class="sermon-card-bg"></div>
         <div class="sermon-source">
           <span class="sermon-source-dot"></span>
-          <span>Live from Greater Mount Salem</span>
+          <span>Live from Salem</span>
         </div>
         <div class="sermon-card-meta">
           <span>Featured Message</span>
-          <span class="meta-dot"></span>
-          <span>Sunday Service</span>
         </div>
         <div class="sermon-inner">
           <div class="sermon-scripture">Matthew 27:25-33</div>
