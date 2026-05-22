@@ -50,6 +50,7 @@
   --gold: #c9a961;
   --gold-soft: #d4b878;
   --gold-deep: #a88845;
+  --gold-text: #785f2e; /* AA-compliant gold for small text on light backgrounds (5.3:1 on ivory) */
   --rose: #b89090;
   --rose-deep: #9a7575;
   --rose-whisper: #d9c0c0;
@@ -115,7 +116,7 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
 }
 .eyebrow.center { justify-content: center; }
-.eyebrow.dark { color: var(--gold-deep); }
+.eyebrow.dark { color: var(--gold-text); }
 
 /* ============================================================
    NAV
@@ -343,7 +344,7 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.06;
   mix-blend-mode: overlay;
   pointer-events: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='3'/></filter><rect width='400' height='400' filter='url(%23n)'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence baseFrequency='0.85' numOctaves='3'/></filter><rect width='400' height='400' filter='url(%23n)'/></svg>");
 }
 .hero-content {
   position: relative;
@@ -743,7 +744,7 @@ a { color: inherit; text-decoration: none; }
   font-family: 'Fraunces', serif;
   font-size: clamp(36px, 4vw, 52px);
   font-weight: 400;
-  color: var(--gold-deep);
+  color: var(--gold-text);
   line-height: 1;
   margin-bottom: 8px;
 }
@@ -847,7 +848,7 @@ a { color: inherit; text-decoration: none; }
   content: '';
   position: absolute;
   inset: 0;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.4'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence baseFrequency='0.9' numOctaves='2'/></filter><rect width='200' height='200' filter='url(%23n)' opacity='0.4'/></svg>");
   opacity: 0.04;
   mix-blend-mode: overlay;
   pointer-events: none;
@@ -1420,7 +1421,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 10px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--gold-deep);
+  color: var(--gold-text);
   font-weight: 500;
   margin-bottom: 14px;
   display: flex;
@@ -1506,7 +1507,7 @@ a { color: inherit; text-decoration: none; }
   display: inline-block;
 }
 .info-link:hover {
-  color: var(--gold-deep);
+  color: var(--gold-text);
   border-bottom-color: var(--gold);
 }
 
@@ -2154,7 +2155,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 10px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--gold-deep);
+  color: var(--gold-text);
   font-weight: 500;
   margin-bottom: 10px;
   display: flex;
@@ -2204,7 +2205,7 @@ a { color: inherit; text-decoration: none; }
   gap: 6px;
 }
 .invite-field label .required {
-  color: var(--gold-deep);
+  color: var(--gold-text);
   font-weight: 700;
 }
 
@@ -2239,7 +2240,7 @@ a { color: inherit; text-decoration: none; }
 /* Select with custom chevron */
 .invite-field select {
   cursor: pointer;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a88845' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a88845' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
   background-repeat: no-repeat;
   background-position: right 0 center;
   background-size: 18px;
@@ -2374,7 +2375,7 @@ a { color: inherit; text-decoration: none; }
   transition: all 0.3s var(--ease);
 }
 .invite-thanks-reset:hover {
-  color: var(--gold-deep);
+  color: var(--gold-text);
   border-bottom-color: var(--gold);
 }
 
@@ -3154,7 +3155,7 @@ a { color: inherit; text-decoration: none; }
 .book-byline .star-row {
   display: inline-flex;
   gap: 2px;
-  color: var(--gold-deep);
+  color: var(--gold-text);
   font-size: 14px;
 }
 .book-byline .divider-dot {
@@ -3248,6 +3249,113 @@ a { color: inherit; text-decoration: none; }
   transform: translateY(0);
 }
 
+/* ============================================================
+   MOBILE POLISH & ACCESSIBILITY  (final QA pass)
+   ============================================================ */
+
+/* Prevent any element from forcing horizontal scroll on phones.
+   body already has overflow-x:hidden; this is a belt-and-suspenders
+   guard so a stray wide element can never create a sideways scroll. */
+html, body { max-width: 100%; }
+
+/* Visible keyboard focus ring across all interactive elements.
+   Uses :focus-visible so it only shows for keyboard users, not on
+   mouse click — meets WCAG 2.4.7 without disrupting the visual design. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.sermon-card:focus-visible,
+.nav-toggle:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Larger, finger-friendly hamburger tap target (WCAG 2.5.5 — min 44x44).
+   The icon stays visually small; the hit area grows via padding. */
+.nav-toggle {
+  padding: 12px;
+  min-width: 44px;
+  min-height: 44px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width: 900px) {
+  .nav-toggle { display: flex; }
+}
+
+/* Respect users who prefer reduced motion — disable the big animations
+   (reveals, book spin, carousel easing) for vestibular safety. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1 !important; transform: none !important; }
+}
+
+/* ---- Phone-specific layout tightening (~375px target) ---- */
+@media (max-width: 600px) {
+  /* Slightly tighter section padding so content isn't cramped against edges
+     yet still has breathing room. */
+  .section { padding: var(--space-section) 22px; }
+  .hero { padding: 120px 22px 72px; }
+  .nav { padding: 16px 20px; }
+  .nav.scrolled { padding: 12px 20px; }
+
+  /* Ensure all primary buttons are full-width and tall enough to tap. */
+  .btn {
+    min-height: 48px;
+    padding: 16px 24px;
+  }
+  .hero-cta { width: 100%; }
+  .hero-cta .btn { flex: 1 1 auto; justify-content: center; }
+
+  /* Carousel arrows: keep them comfortably tappable and clear of card edges. */
+  .sermon-nav-arrow { width: 46px; height: 46px; }
+
+  /* Dots: enlarge the invisible tap area without changing the visual dot. */
+  .sermon-dot {
+    position: relative;
+  }
+  .sermon-dot::after {
+    content: '';
+    position: absolute;
+    inset: -14px;
+  }
+
+  /* Form fields comfortably tall for thumbs; 16px font prevents iOS zoom-on-focus. */
+  .invite-field input,
+  .invite-field select,
+  .invite-field textarea,
+  .connect-form input {
+    font-size: 16px;
+    padding: 14px 0;
+  }
+  .connect-form input { padding: 16px 18px; }
+
+  /* Headlines: make sure the big clamp() display type never overflows. */
+  .hero-name { word-break: break-word; }
+}
+
+/* iOS Safari: prevent the auto-zoom that fires when a sub-16px input is
+   focused. Applies the 16px floor to all text inputs site-wide. */
+input, select, textarea { font-size: max(16px, 1em); }
+
+/* Make sure the mobile nav drawer is scrollable if it ever exceeds height
+   (e.g. small landscape phones) and sits above everything. */
+@media (max-width: 900px) {
+  .nav-links {
+    overflow-y: auto;
+    z-index: 100;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -3256,7 +3364,7 @@ a { color: inherit; text-decoration: none; }
      NAV
      ============================================================ -->
 <nav class="nav" id="nav">
-  <a href="#" class="nav-logo" aria-label="Bishop Joel Robinson Sr. — JDR"><span class="letter j">J</span><span class="letter d">D</span><span class="letter r">R</span></a>
+  <a href="#hero" class="nav-logo" aria-label="Bishop Joel Robinson Sr. — home"><span class="letter j">J</span><span class="letter d">D</span><span class="letter r">R</span></a>
   <button class="nav-toggle" id="navToggle" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
@@ -3277,10 +3385,10 @@ a { color: inherit; text-decoration: none; }
 <section class="hero" id="hero" data-nav-theme="dark">
   <div class="hero-media">
     <div class="hero-placeholder"></div>
-    <video class="hero-video hero-video-a" autoplay muted playsinline preload="auto" poster="ASSETS/hero-poster.jpg">
+    <video class="hero-video hero-video-a" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="ASSETS/hero-poster.jpg">
       <source src="ASSETS/hero-preaching.mp4" type="video/mp4">
     </video>
-    <video class="hero-video hero-video-b" muted playsinline preload="auto">
+    <video class="hero-video hero-video-b" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="ASSETS/hero-poster.jpg">
       <source src="ASSETS/hero-preaching.mp4" type="video/mp4">
     </video>
   </div>
@@ -3519,14 +3627,14 @@ a { color: inherit; text-decoration: none; }
           <h3 class="sermon-title">"I've Got to Get to <em>the Hill</em>"</h3>
           <div class="sermon-watch">
             <span class="sermon-watch-label">
-              <svg class="sermon-watch-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+              <svg aria-hidden="true" class="sermon-watch-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
               Watch on YouTube
             </span>
             <span class="sermon-watch-arrow">↗</span>
           </div>
         </div>
         <div class="sermon-play-overlay">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
       </a>
 
@@ -3549,14 +3657,14 @@ a { color: inherit; text-decoration: none; }
           <h3 class="sermon-title">"A Call to Be <em>Excellent</em>"</h3>
           <div class="sermon-watch">
             <span class="sermon-watch-label">
-              <svg class="sermon-watch-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+              <svg aria-hidden="true" class="sermon-watch-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
               Watch on YouTube
             </span>
             <span class="sermon-watch-arrow">↗</span>
           </div>
         </div>
         <div class="sermon-play-overlay">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
       </a>
 
@@ -3579,14 +3687,14 @@ a { color: inherit; text-decoration: none; }
           <h3 class="sermon-title">"Take Care of Your <em>Temple</em>"</h3>
           <div class="sermon-watch">
             <span class="sermon-watch-label">
-              <svg class="sermon-watch-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+              <svg aria-hidden="true" class="sermon-watch-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
               Watch on YouTube
             </span>
             <span class="sermon-watch-arrow">↗</span>
           </div>
         </div>
         <div class="sermon-play-overlay">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
         </div>
       </a>
 
@@ -3626,11 +3734,13 @@ a { color: inherit; text-decoration: none; }
           <video
             class="church-video"
             data-autoplay-on-scroll
+            autoplay
             muted
             loop
             playsinline
+            webkit-playsinline
             preload="metadata"
-            poster="">
+            poster="ASSETS/bishop-preaching-hero.jpg">
             <source src="ASSETS/greater-mount-salem-service.mp4" type="video/mp4">
           </video>
           <div class="church-media-overlay"></div>
@@ -3645,7 +3755,7 @@ a { color: inherit; text-decoration: none; }
           <div class="church-info">
             <div class="info-row">
               <div class="info-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </div>
               <div>
                 <div class="info-label">Address</div>
@@ -3661,7 +3771,7 @@ a { color: inherit; text-decoration: none; }
             </div>
             <div class="info-row">
               <div class="info-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
               </div>
               <div>
                 <div class="info-label">Service Times</div>
@@ -3691,11 +3801,13 @@ a { color: inherit; text-decoration: none; }
           <video
             class="church-video"
             data-autoplay-on-scroll
+            autoplay
             muted
             loop
             playsinline
+            webkit-playsinline
             preload="metadata"
-            poster="">
+            poster="ASSETS/bishop-preaching-hero.jpg">
             <source src="ASSETS/new-life-service.mp4" type="video/mp4">
           </video>
           <div class="church-media-overlay"></div>
@@ -3710,7 +3822,7 @@ a { color: inherit; text-decoration: none; }
           <div class="church-info">
             <div class="info-row">
               <div class="info-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
               </div>
               <div>
                 <div class="info-label">Address</div>
@@ -3726,7 +3838,7 @@ a { color: inherit; text-decoration: none; }
             </div>
             <div class="info-row">
               <div class="info-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
               </div>
               <div>
                 <div class="info-label">Service Times</div>
@@ -3799,7 +3911,7 @@ a { color: inherit; text-decoration: none; }
       <div class="midweek-row">
         <div class="midweek-cell">
           <div class="midweek-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           </div>
           <div class="midweek-content">
             <div class="midweek-day">Wednesday Bible Study</div>
@@ -3809,7 +3921,7 @@ a { color: inherit; text-decoration: none; }
 
         <div class="midweek-cell">
           <div class="midweek-mark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
           </div>
           <div class="midweek-content">
             <div class="midweek-day">Tuesday Bible Study</div>
@@ -3858,12 +3970,15 @@ a { color: inherit; text-decoration: none; }
 <!-- ============================================================
      INVITE HIM TO PREACH — Booking Form
      ============================================================
-     FORMSPREE SETUP:
-     1. Sign up at https://formspree.io (free tier)
-     2. Create a new form, copy the form ID
-     3. Replace YOUR_FORM_ID below in the form action attribute
-     4. Configure the recipient email in your Formspree dashboard
-     The form will work immediately once the ID is in place.
+     FORM DELIVERY (already wired — FormSubmit.co):
+     - Submissions are emailed to admin@merxstudios.com
+     - FIRST submission triggers a one-time confirmation email to
+       that address. Click the activation link in it ONCE, then all
+       future submissions deliver automatically. (Do this test
+       submission yourself before the client sees the site.)
+     - To change the recipient, edit the email in the <form action>
+       and the two mailto fallbacks below.
+     - To switch providers (e.g. Formspree), just swap the action URL.
      ============================================================ -->
 <section class="section invite" id="invite" data-nav-theme="light">
   <div class="container">
@@ -3913,11 +4028,26 @@ a { color: inherit; text-decoration: none; }
           <h3 class="invite-form-card-title">Tell Bishop Robinson about your event</h3>
         </div>
 
-        <!-- FORMSPREE: Replace YOUR_FORM_ID in the action below with your real form ID -->
+        <!-- ============================================================
+             FORM DELIVERY — FormSubmit.co (no account required)
+             Submissions are emailed to admin@merxstudios.com.
+             IMPORTANT: The FIRST submission triggers a one-time
+             confirmation email from FormSubmit to that address —
+             click the activation link in it once, and all future
+             submissions deliver automatically.
+             To switch to Formspree later, just change the action URL.
+             ============================================================ -->
         <form class="invite-form"
               id="inviteForm"
-              action="https://formspree.io/f/YOUR_FORM_ID"
+              action="https://formsubmit.co/admin@merxstudios.com"
               method="POST">
+
+          <!-- FormSubmit config: subject line, disable its captcha redirect,
+               and a honeypot field to silently trap spam bots. -->
+          <input type="hidden" name="_subject" value="New Invitation — Bishop Robinson Website">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_template" value="table">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
 
           <div class="invite-field">
             <label for="invite-name">Full Name <span class="required">*</span></label>
@@ -3970,7 +4100,7 @@ a { color: inherit; text-decoration: none; }
 
           <!-- Error message (hidden by default) -->
           <div class="invite-error" id="inviteError">
-            Something went wrong sending your invitation. Please try again, or reach out by email instead.
+            Something went wrong sending your invitation. Please try again, or email us directly at <a href="mailto:admin@merxstudios.com" style="color: inherit; text-decoration: underline;">admin@merxstudios.com</a>.
           </div>
 
           <div class="invite-submit-row">
@@ -4019,18 +4149,11 @@ a { color: inherit; text-decoration: none; }
     <p class="connect-note">We respect your inbox. Unsubscribe any time.</p>
 
     <div class="socials">
-      <a href="https://www.youtube.com/@greatermtsalembaptistchurch" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+      <a href="https://www.youtube.com/@greatermtsalembaptistchurch" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="YouTube — Greater Mount Salem Baptist Church">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.5 6.2c-.3-1-1.1-1.8-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6c-1 .3-1.8 1.1-2.1 2.1C0 8.1 0 12 0 12s0 3.9.5 5.8c.3 1 1.1 1.8 2.1 2.1 1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6c1-.3 1.8-1.1 2.1-2.1.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
       </a>
-      <a href="#" class="social-link" aria-label="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
-      </a>
-      <a href="#" class="social-link" aria-label="Facebook">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12c0-5.5-4.5-10-10-10S2 6.5 2 12c0 5 3.7 9.1 8.4 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.3v7C18.3 21.1 22 17 22 12z"/></svg>
-      </a>
-      <a href="#" class="social-link" aria-label="X / Twitter">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </a>
+      <!-- Instagram, Facebook, and X icons removed — no live accounts provided yet.
+           To restore: add an <a> with the real profile URL and the matching SVG. -->
     </div>
   </div>
 </section>
@@ -4063,18 +4186,18 @@ a { color: inherit; text-decoration: none; }
           <li><a href="#invite">Invite Him to Preach</a></li>
           <li><a href="#connect">Newsletter</a></li>
           <li><a href="#book">The Book</a></li>
-          <li><a href="mailto:contact@example.com">Contact</a></li>
+          <li><a href="mailto:admin@merxstudios.com">Contact</a></li>
         </ul>
       </div>
       <div class="give-card">
         <h5>Sow into the Ministry</h5>
         <p>Your generosity helps fund the preaching, teaching, and pastoral work of Bishop Robinson and the two congregations he serves.</p>
-        <a href="#">Give Now <span class="btn-arrow">→</span></a>
+        <a href="mailto:admin@merxstudios.com?subject=Giving%20to%20Bishop%20Robinson%27s%20Ministry">Give Now <span class="btn-arrow">→</span></a>
       </div>
     </div>
     <div class="footer-bottom">
       <div>© <span id="year"></span> Bishop Joel Robinson Sr. Ministries. All rights reserved.</div>
-      <div><a href="#" style="opacity: 0.6;">Privacy</a> &middot; <a href="#" style="opacity: 0.6;">Terms</a></div>
+      <div>Jacksonville, Florida</div>
     </div>
   </div>
 </footer>
@@ -4148,6 +4271,41 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   const videoA = document.querySelector('.hero-video-a');
   const videoB = document.querySelector('.hero-video-b');
   if (!heroMedia || !videoA || !videoB) return;
+
+  // iOS reliability: set muted/playsinline as PROPERTIES, not just attributes.
+  [videoA, videoB].forEach(v => {
+    v.muted = true;
+    v.defaultMuted = true;
+    v.setAttribute('muted', '');
+    v.playsInline = true;
+  });
+
+  // Kick off playback explicitly (covers browsers that ignore the attribute).
+  function tryPlay(v) {
+    const p = v.play();
+    if (p !== undefined) p.catch(() => {});
+  }
+  tryPlay(videoA);
+
+  // Fallback: if autoplay was blocked (some mobile browsers / low-power mode),
+  // start playback on the first user interaction anywhere on the page.
+  function resumeOnInteract() {
+    tryPlay(videoA);
+    document.removeEventListener('touchstart', resumeOnInteract);
+    document.removeEventListener('click', resumeOnInteract);
+  }
+  document.addEventListener('touchstart', resumeOnInteract, { passive: true, once: true });
+  document.addEventListener('click', resumeOnInteract, { once: true });
+
+  // On small screens, skip the dual-video crossfade entirely. Mobile Safari
+  // limits simultaneous video decoders, and running two hero videos plus the
+  // church videos is the #1 cause of freezing on phones. A single looping
+  // video (via the loop attribute) is smooth and reliable instead.
+  const isSmallScreen = window.matchMedia('(max-width: 768px)').matches;
+  if (isSmallScreen) {
+    // videoB stays hidden; videoA loops on its own via the loop attribute.
+    return;
+  }
 
   const CROSSFADE_LEAD_TIME = 1.0;
   let activeVideo = videoA;
@@ -4361,17 +4519,17 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   const resetBtn = document.getElementById('inviteReset');
   if (!form || !card || !thanks || !submitBtn) return;
 
-  // Detect if the form is still pointing at the placeholder
+  // Detect if the form is still pointing at an unconfigured placeholder.
   const isPlaceholder = form.action.includes('YOUR_FORM_ID');
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorBox.classList.remove('is-visible');
 
-    // If still on placeholder URL, simulate success in dev mode
-    // so the thank-you state can be previewed before Formspree is set up.
+    // If still on a placeholder URL, simulate success so the thank-you
+    // state can be previewed before the email service is configured.
     if (isPlaceholder) {
-      console.warn('Invite form: Formspree URL not yet configured. Showing thank-you preview.');
+      console.warn('Invite form: delivery URL not yet configured. Showing thank-you preview.');
       card.classList.add('is-thanked');
       thanks.classList.add('is-visible');
       thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -4382,8 +4540,16 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     submitBtn.disabled = true;
     if (submitText) submitText.textContent = 'Sending...';
 
+    // FormSubmit's AJAX endpoint lives at /ajax/ — POST there for a JSON
+    // response instead of a redirect. We rewrite the action on the fly so
+    // the visible form action stays clean/readable.
+    let endpoint = form.action;
+    if (endpoint.includes('formsubmit.co/') && !endpoint.includes('/ajax/')) {
+      endpoint = endpoint.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+    }
+
     try {
-      const response = await fetch(form.action, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: new FormData(form),
         headers: { 'Accept': 'application/json' }
@@ -4396,7 +4562,7 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
         thanks.scrollIntoView({ behavior: 'smooth', block: 'center' });
         form.reset();
       } else {
-        // Form service returned an error
+        // Service returned an error
         errorBox.classList.add('is-visible');
         submitBtn.disabled = false;
         if (submitText) submitText.textContent = 'Send Invitation';
@@ -4426,6 +4592,16 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 (function() {
   const churchVideos = document.querySelectorAll('video[data-autoplay-on-scroll]');
   if (!churchVideos.length) return;
+
+  // iOS reliability: explicitly set the muted PROPERTY (not just the attribute)
+  // and the playsinline property in JS. Safari sometimes ignores the HTML
+  // attributes alone, which is the #1 cause of "video freezes on iPhone".
+  churchVideos.forEach(video => {
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.playsInline = true;
+  });
 
   // Each video gets a dedicated observer so they play/pause independently.
   // Threshold 0.3 = video starts playing when ~30% of it is in view —
