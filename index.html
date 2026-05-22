@@ -1284,12 +1284,24 @@ a { color: inherit; text-decoration: none; }
   .sermons-stage .sermon-card {
     width: min(320px, 78vw);
   }
-  /* On mobile, hide the side cards entirely — they just create clutter */
-  .sermons-stage .sermon-card.is-prev,
-  .sermons-stage .sermon-card.is-next {
-    opacity: 0;
-    pointer-events: none;
+
+  /* On mobile, ONLY the active card renders. Every other card —
+     prev, next, and the far-off unfocused cards — is removed from
+     layout entirely with display:none. opacity:0 alone wasn't enough:
+     the side/unfocused cards were still painting behind the active
+     card and bleeding their text through. display:none is absolute. */
+  .sermons-stage .sermon-card {
+    display: none;
   }
+  .sermons-stage .sermon-card.is-active {
+    display: flex;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+    filter: none;
+    pointer-events: auto;
+    z-index: 3;
+  }
+
   .sermon-nav-arrow {
     width: 44px;
     height: 44px;
