@@ -263,22 +263,82 @@ a { color: inherit; text-decoration: none; }
     position: fixed;
     top: 0; right: 0;
     height: 100vh;
-    width: min(360px, 80vw);
+    height: 100dvh;
+    width: min(360px, 82vw);
     background: var(--ink-deep);
     flex-direction: column;
     justify-content: center;
     padding: 60px 40px;
-    gap: 28px;
+    gap: 8px;
     transform: translateX(100%);
     transition: transform 0.4s var(--ease);
     border-left: 1px solid rgba(201, 169, 97, 0.15);
+    z-index: 100;
+    overflow-y: auto;
   }
   .nav-links.open { transform: translateX(0); }
-  .nav-links a { font-size: 15px; }
-  .nav-toggle { display: block; z-index: 101; }
+
+  /* CRITICAL: inside the dark mobile drawer, links must ALWAYS be light,
+     overriding the inherited color from .nav.over-light (which turns links
+     dark for light sections on desktop). Without this, dark links sit on the
+     near-black drawer and become invisible. */
+  .nav-links a,
+  .nav.over-light .nav-links a {
+    color: var(--ivory) !important;
+    font-size: 17px;
+    font-weight: 400;
+    width: 100%;
+    padding: 14px 4px;
+    display: block;
+    min-height: 44px;
+    border-bottom: 1px solid rgba(245, 240, 232, 0.08);
+  }
+  .nav-links a:hover,
+  .nav-links a:active {
+    color: var(--gold) !important;
+  }
+  /* underline accent isn't needed in the stacked mobile menu */
+  .nav-links a::after { display: none; }
+
+  /* The Connect CTA keeps its gold pill but spans the drawer width */
+  .nav-links .nav-cta,
+  .nav.over-light .nav-links .nav-cta {
+    background: var(--gold);
+    color: var(--ink) !important;
+    text-align: center;
+    margin-top: 16px;
+    padding: 16px 22px;
+    border-bottom: none;
+    border-radius: 2px;
+  }
+  .nav-links .nav-cta:hover { background: var(--gold-soft); color: var(--ink) !important; }
+
+  .nav-toggle { display: flex; z-index: 101; }
   .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav-toggle.open span:nth-child(2) { opacity: 0; }
   .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* When the drawer is open, the hamburger icon must stay visible against
+     the dark panel — force it light regardless of section theme. */
+  .nav-toggle.open span { background: var(--ivory); }
+
+  /* Dimming backdrop behind the open drawer — focuses attention on the menu
+     and visually separates it from the page content bleeding through. */
+  .nav-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(12, 10, 9, 0.5);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s var(--ease), visibility 0.4s var(--ease);
+    z-index: 99;
+  }
+  .nav-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+  }
 }
 
 /* ============================================================
@@ -3378,6 +3438,7 @@ input, select, textarea { font-size: max(16px, 1em); }
     <li><a href="#connect" class="nav-cta">Connect</a></li>
   </ul>
 </nav>
+<div class="nav-backdrop" id="navBackdrop" aria-hidden="true"></div>
 
 <!-- ============================================================
      HERO
@@ -4243,15 +4304,48 @@ updateNav();
 // ============ MOBILE NAV ============
 const navToggle = document.getElementById('navToggle');
 const navLinks = document.getElementById('navLinks');
-navToggle.addEventListener('click', () => {
-  navToggle.classList.toggle('open');
-  navLinks.classList.toggle('open');
-});
+const navBackdrop = document.getElementById('navBackdrop');
+
+function openMenu() {
+  navToggle.classList.add('open');
+  navLinks.classList.add('open');
+  if (navBackdrop) navBackdrop.classList.add('open');
+  navToggle.setAttribute('aria-expanded', 'true');
+  // Lock background scroll while the drawer is open
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  navToggle.classList.remove('open');
+  navLinks.classList.remove('open');
+  if (navBackdrop) navBackdrop.classList.remove('open');
+  navToggle.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+}
+function toggleMenu() {
+  if (navLinks.classList.contains('open')) closeMenu();
+  else openMenu();
+}
+
+navToggle.setAttribute('aria-expanded', 'false');
+navToggle.setAttribute('aria-controls', 'navLinks');
+navToggle.addEventListener('click', toggleMenu);
+
+// Tapping a link closes the menu
 navLinks.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    navToggle.classList.remove('open');
-    navLinks.classList.remove('open');
-  });
+  a.addEventListener('click', closeMenu);
+});
+
+// Tapping the dimmed backdrop closes the menu
+if (navBackdrop) navBackdrop.addEventListener('click', closeMenu);
+
+// Escape key closes the menu (keyboard accessibility)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && navLinks.classList.contains('open')) closeMenu();
+});
+
+// If the viewport grows past mobile while the menu is open, reset cleanly
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 900 && navLinks.classList.contains('open')) closeMenu();
 });
 
 // ============ REVEAL ON SCROLL ============
