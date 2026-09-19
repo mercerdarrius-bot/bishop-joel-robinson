@@ -4180,17 +4180,15 @@ input, select, textarea { font-size: max(16px, 1em); }
 <!-- ============================================================
      INVITE HIM TO PREACH: Booking Form
      ============================================================
-     FORM DELIVERY (Web3Forms) - ONE STEP LEFT BEFORE LAUNCH:
-     - Get a free access key at https://web3forms.com. You enter the
-       destination email there; they email you the key. No account,
-       no dashboard, no activation click on first submission.
-     - Paste it into the access_key hidden input below, replacing
-       YOUR_WEB3FORMS_ACCESS_KEY.
-     - Until that key is in, the form shows its thank-you state but
-       delivers nothing. Send one real test after pasting the key.
-     - The destination email lives with Web3Forms, not in this file.
-       The mailto fallbacks below are separate; update them too if
-       the contact address ever changes.
+     FORM DELIVERY (Web3Forms): live and delivering.
+     - The access_key below is what routes submissions. The destination
+       email address lives with Web3Forms, not in this file, so changing
+       where invitations land is done at web3forms.com, not here.
+     - The mailto fallbacks below are separate from that. If the contact
+       address ever changes, update them too.
+     - If the key is ever blanked or replaced with a placeholder, the
+       form stops pretending: it shows an honest error pointing at the
+       mailto instead of a thank-you for something it never sent.
      ============================================================ -->
 <section class="section invite" id="invite" data-nav-theme="light">
   <div class="container">
@@ -4245,15 +4243,11 @@ input, select, textarea { font-size: max(16px, 1em); }
               action="https://api.web3forms.com/submit"
               method="POST">
 
-          <!-- Web3Forms config.
-               access_key is the ONLY thing standing between this form and
-               live delivery. Get it free at https://web3forms.com (enter the
-               destination email, they mail you the key), then paste it below
-               in place of YOUR_WEB3FORMS_ACCESS_KEY.
-               Until then the form shows the thank-you state but sends nothing.
-               botcheck is Web3Forms' built-in honeypot: real people never see
+          <!-- Web3Forms config. access_key routes the submission; the
+               destination inbox is configured at web3forms.com, not here.
+               botcheck is Web3Forms built-in honeypot: real people never see
                it, bots tick it and get silently dropped. -->
-          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY">
+          <input type="hidden" name="access_key" value="aa5274c7-0e9d-4e8a-882a-5dd9a84a7acc">
           <input type="hidden" name="subject" value="New Invitation: Bishop Robinson Website">
           <input type="hidden" name="from_name" value="Bishop Joel Robinson Sr. Website">
           <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -4843,7 +4837,7 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   const resetBtn = document.getElementById('inviteReset');
   if (!form || !card || !thanks || !submitBtn) return;
 
-  // Detect if the form is still carrying the unconfigured placeholder key.
+  // Guard against the key being blanked or replaced with a placeholder later.
   const accessKey = form.querySelector('input[name="access_key"]')?.value || '';
   const isPlaceholder = accessKey.includes('YOUR_WEB3FORMS_ACCESS_KEY') || !accessKey;
 
