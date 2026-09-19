@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bishop Joel Robinson Sr.</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<meta name="robots" content="noindex">
+<!--
+  GitHub Pages has no server-side rewrites, so a direct visit to a clean URL
+  like /teaching lands here. This hands the path to the main page and steps
+  aside. Painted in the site's ink so the hand-off reads as a beat in the page
+  load rather than a flash of white.
+
+  Anything that is not a real section simply arrives at the home page.
+-->
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #161412;
+  }
+</style>
+<script>
+  (function () {
+    try {
+      sessionStorage.setItem('jdr:path', window.location.pathname);
+    } catch (err) {
+      // Private mode blocks storage. Fall back to a hash, which the main page
+      // also understands, so the visitor still lands in the right place.
+      window.location.replace('/#' + window.location.pathname.replace(/^\/+|\/+$/g, ''));
+      return;
+    }
+    window.location.replace('/');
+  })();
+</script>
+</head>
+<body></body>
+</html>

@@ -4525,6 +4525,185 @@ window.addEventListener('scroll', () => {
 window.addEventListener('resize', updateNav);
 updateNav();
 
+// ============ CLEAN URLS ============
+// The nav is built on real in-page anchors, so the browser would normally park
+// "#teaching" in the address bar. This trades that for "/teaching" while the
+// site stays a single scrolling page.
+//
+// Deliberately an enhancement, not a replacement: the markup still carries
+// href="#id", so if this script never runs the nav degrades to ordinary anchor
+// links that still work. Old links people already shared with a #hash still
+// land correctly too, and get tidied on arrival.
+//
+// Direct visits to /teaching are caught by 404.html, which hands the path back
+// here through sessionStorage. That is the one seam: GitHub Pages has no
+// server-side rewrites, so such a visit answers 404 before landing.
+(function() {
+  if (!window.history || !history.pushState) return;
+
+  const pathFor = (id) => (id === 'hero' ? '/' : '/' + id);
+  const sectionFor = (path) => {
+    const slug = String(path || '').replace(/^\/+|\/+$/g, '');
+    return slug && document.getElementById(slug) ? slug : 'hero';
+  };
+
+  function setUrl(id, push) {
+    const url = pathFor(id);
+    // Compare path AND hash: when converting "/#teaching" the path can already
+    // match while the hash still needs clearing.
+    if (!push && location.pathname === url && !location.hash) return;
+    // Some embedded and file:// contexts reject history writes. The page must
+    // keep working there, so a failure here is swallowed rather than thrown.
+    try {
+      history[push ? 'pushState' : 'replaceState']({ section: id }, '', url);
+    } catch (err) { /* address bar stays as-is; scrolling is unaffected */ }
+  }
+
+  // A programmatic scroll fires scroll events the whole way down. Without this
+  // lock the scroll tracker below rewrites the address bar to whichever section
+  // is passing under the nav mid-flight, so clicking "Follow" could land you on
+  // /invite. The lock is held until the page actually stops moving, with a hard
+  // ceiling so a interrupted scroll can never strand it.
+  let locked = false;
+  let settleTimer = null;
+  let lockCeiling = null;
+
+  function releaseLock() {
+    locked = false;
+    clearTimeout(settleTimer);
+    clearTimeout(lockCeiling);
+  }
+
+  function goTo(id, smooth) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    locked = true;
+    clearTimeout(settleTimer);
+    clearTimeout(lockCeiling);
+    lockCeiling = setTimeout(releaseLock, 2000);
+
+    const behavior = smooth ? 'smooth' : 'auto';
+    if (id === 'hero') window.scrollTo({ top: 0, behavior });
+    else el.scrollIntoView({ behavior, block: 'start' });
+
+    // Poll until two readings match, meaning the scroll has come to rest.
+    let lastY = null;
+    (function settle() {
+      settleTimer = setTimeout(() => {
+        if (lastY !== null && Math.abs(window.scrollY - lastY) < 2) {
+          releaseLock();
+          setUrl(id, false); // the bar states the destination, not a neighbour
+          return;
+        }
+        lastY = window.scrollY;
+        settle();
+      }, 90);
+    })();
+  }
+
+  // A human grabbing the scrollbar or wheel mid-animation should win.
+  ['wheel', 'touchstart', 'keydown'].forEach((evt) => {
+    window.addEventListener(evt, () => { if (locked) releaseLock(); }, { passive: true });
+  });
+
+  // ---- Nav links and in-page CTAs ----
+  document.addEventListener('click', (e) => {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const link = e.target.closest('a[href^="#"]');
+    if (!link || link.target === '_blank') return;
+    const id = link.getAttribute('href').slice(1);
+    if (!id || !document.getElementById(id)) return;
+    e.preventDefault();
+    goTo(id, true);
+    setUrl(id, true);
+  });
+
+  // Put the visitor on a section and tidy the bar, without leaning on the
+  // browser's own fragment scroll: rewriting the hash away can cancel that
+  // scroll before it ever runs, which leaves people stranded at the top.
+  // Landing is re-asserted after load because images and fonts shift the page
+  // height, so a position measured too early lands in the wrong place.
+  function land(id) {
+    setUrl(id, false);
+
+    // Do not scroll until the target stops moving. Videos and images resize as
+    // they load and push sections down the page, so a position measured too
+    // early lands short: a first pass here put a /church visit 477px past the
+    // heading. Poll the section's offset until two readings agree, then go.
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    const start = Date.now();
+    let lastTop = null;
+
+    (function whenStable() {
+      const top = Math.round(el.getBoundingClientRect().top + window.scrollY);
+      const stable = lastTop !== null && Math.abs(top - lastTop) < 2;
+
+      // Ceiling so a page that never stops shifting still lands somewhere sane.
+      if (stable || Date.now() - start > 2500) {
+        goTo(id, false);
+        setUrl(id, false);
+        return;
+      }
+      lastTop = top;
+      setTimeout(whenStable, 100);
+    })();
+  }
+
+  // ---- A hash arriving after load ----
+  // Someone pasting jdrministries.com/#teaching into an already-open tab, or a
+  // browser that applies the fragment after scripts have run.
+  window.addEventListener('hashchange', () => {
+    if (location.hash.length <= 1) return;
+    land(sectionFor(location.hash.slice(1)));
+  });
+
+  // ---- Back and forward ----
+  // pushState on click means the back button still steps between sections,
+  // which is what the #hash version did. Scrolling uses replaceState so it
+  // never floods history.
+  window.addEventListener('popstate', () => goTo(sectionFor(location.pathname), true));
+
+  // ---- Keep the bar in step while scrolling ----
+  const themed = [...document.querySelectorAll('section[id]')];
+  let ticking = false;
+  function syncUrl() {
+    const probe = (document.getElementById('nav')?.offsetHeight || 0) / 2 + 16;
+    let current = 'hero';
+    themed.forEach((sec) => {
+      const r = sec.getBoundingClientRect();
+      if (r.top <= probe && r.bottom >= probe) current = sec.id;
+    });
+    // At the very top it is the home page, not the first section.
+    if (window.scrollY < 40) current = 'hero';
+    setUrl(current, false);
+  }
+  window.addEventListener('scroll', () => {
+    if (locked || ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { syncUrl(); ticking = false; });
+  }, { passive: true });
+
+  // ---- Arrival ----
+  // Three ways in: a clean path bounced through 404.html, an old #hash link,
+  // or the bare domain.
+  let entry = null;
+  try {
+    entry = sessionStorage.getItem('jdr:path');
+    if (entry) sessionStorage.removeItem('jdr:path');
+  } catch (err) { /* private mode: fall through to the hash check */ }
+
+  if (entry) {
+    land(sectionFor(entry));
+  } else if (location.hash.length > 1) {
+    land(sectionFor(location.hash.slice(1)));
+  } else {
+    syncUrl();
+  }
+})();
+
 // ============ MOBILE NAV ============
 const navToggle = document.getElementById('navToggle');
 const navLinks = document.getElementById('navLinks');
