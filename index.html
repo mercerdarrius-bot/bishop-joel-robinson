@@ -4541,6 +4541,12 @@ updateNav();
 (function() {
   if (!window.history || !history.pushState) return;
 
+  // The browser restores the previous scroll position when the page finishes
+  // loading. This page finishes late because of the videos, so that restore
+  // lands AFTER a deep-link scroll and drags the visitor back to the top.
+  // Position is managed here instead: popstate already scrolls to the section.
+  try { history.scrollRestoration = 'manual'; } catch (err) { /* older browsers */ }
+
   const pathFor = (id) => (id === 'hero' ? '/' : '/' + id);
   const sectionFor = (path) => {
     const slug = String(path || '').replace(/^\/+|\/+$/g, '');
@@ -4602,9 +4608,14 @@ updateNav();
     })();
   }
 
-  // A human grabbing the scrollbar or wheel mid-animation should win.
+  // A human grabbing the scrollbar or wheel mid-animation should win, and once
+  // they have moved deliberately the page must never reposition itself again.
+  let userMoved = false;
   ['wheel', 'touchstart', 'keydown'].forEach((evt) => {
-    window.addEventListener(evt, () => { if (locked) releaseLock(); }, { passive: true });
+    window.addEventListener(evt, () => {
+      userMoved = true;
+      if (locked) releaseLock();
+    }, { passive: true });
   });
 
   // ---- Nav links and in-page CTAs ----
@@ -4645,6 +4656,18 @@ updateNav();
       if (stable || Date.now() - start > 2500) {
         goTo(id, false);
         setUrl(id, false);
+        // Videos keep loading after this point and can still nudge the layout,
+        // so confirm the position once everything is in. Skipped the moment the
+        // visitor scrolls for themselves.
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', () => {
+            setTimeout(() => {
+              if (userMoved) return;
+              goTo(id, false);
+              setUrl(id, false);
+            }, 120);
+          }, { once: true });
+        }
         return;
       }
       lastTop = top;
