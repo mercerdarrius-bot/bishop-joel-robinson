@@ -4573,6 +4573,7 @@ updateNav();
   let locked = false;
   let settleTimer = null;
   let lockCeiling = null;
+  let userMoved = false;
 
   function releaseLock() {
     locked = false;
@@ -4610,7 +4611,6 @@ updateNav();
 
   // A human grabbing the scrollbar or wheel mid-animation should win, and once
   // they have moved deliberately the page must never reposition itself again.
-  let userMoved = false;
   ['wheel', 'touchstart', 'keydown'].forEach((evt) => {
     window.addEventListener(evt, () => {
       userMoved = true;
@@ -4638,41 +4638,46 @@ updateNav();
   function land(id) {
     setUrl(id, false);
 
-    // Do not scroll until the target stops moving. Videos and images resize as
-    // they load and push sections down the page, so a position measured too
-    // early lands short: a first pass here put a /church visit 477px past the
-    // heading. Poll the section's offset until two readings agree, then go.
     const el = document.getElementById(id);
     if (!el) return;
 
-    const start = Date.now();
-    let lastTop = null;
+    // Landing is not a single scroll. The page keeps growing underneath it:
+    // web fonts reflow every heading, and videos and images settle into their
+    // real heights. A one-shot scroll measured against a half-built page lands
+    // in the wrong section entirely (a /events visit ended up on /teaching,
+    // 1,600px short, once Fraunces finished loading).
+    //
+    // So: go immediately, because a visitor should not stare at the hero
+    // waiting for videos, then hold the target at the top while the page
+    // settles. Corrections stop the instant the visitor scrolls for
+    // themselves, and give up after a few seconds regardless.
+    const HOLD_MS = 6000;
+    const started = Date.now();
 
-    (function whenStable() {
-      const top = Math.round(el.getBoundingClientRect().top + window.scrollY);
-      const stable = lastTop !== null && Math.abs(top - lastTop) < 2;
+    goTo(id, false);
 
-      // Ceiling so a page that never stops shifting still lands somewhere sane.
-      if (stable || Date.now() - start > 2500) {
-        goTo(id, false);
+    (function hold() {
+      if (userMoved || Date.now() - started > HOLD_MS) return;
+
+      const drift = Math.round(el.getBoundingClientRect().top);
+      // Re-assert only on real drift, so this never fights a settled page.
+      if (Math.abs(drift) > 4) {
+        window.scrollBy({ top: drift, behavior: 'auto' });
         setUrl(id, false);
-        // Videos keep loading after this point and can still nudge the layout,
-        // so confirm the position once everything is in. Skipped the moment the
-        // visitor scrolls for themselves.
-        if (document.readyState !== 'complete') {
-          window.addEventListener('load', () => {
-            setTimeout(() => {
-              if (userMoved) return;
-              goTo(id, false);
-              setUrl(id, false);
-            }, 120);
-          }, { once: true });
-        }
-        return;
       }
-      lastTop = top;
-      setTimeout(whenStable, 100);
+      setTimeout(hold, 150);
     })();
+
+    // Fonts are the single biggest source of that drift, so take one last look
+    // the moment they are in.
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        if (userMoved) return;
+        const drift = Math.round(el.getBoundingClientRect().top);
+        if (Math.abs(drift) > 4) window.scrollBy({ top: drift, behavior: 'auto' });
+        setUrl(id, false);
+      }).catch(() => {});
+    }
   }
 
   // ---- A hash arriving after load ----
