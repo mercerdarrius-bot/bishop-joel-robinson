@@ -4557,6 +4557,12 @@ updateNav();
   try { history.scrollRestoration = 'manual'; } catch (err) { /* older browsers */ }
 
   const pathFor = (id) => (id === 'hero' ? '/' : '/' + id);
+
+  // Merx Analytics counts a page view when the address changes. Scrolling
+  // only renames the address bar to the section passing under the nav, so it
+  // uses the browser's own replaceState, kept here before the analytics script
+  // (which loads after this one) wraps it. A nav click (pushState) still counts.
+  const nativeReplace = history.replaceState.bind(history);
   const sectionFor = (path) => {
     const slug = String(path || '').replace(/^\/+|\/+$/g, '');
     return slug && document.getElementById(slug) ? slug : 'hero';
@@ -4570,7 +4576,8 @@ updateNav();
     // Some embedded and file:// contexts reject history writes. The page must
     // keep working there, so a failure here is swallowed rather than thrown.
     try {
-      history[push ? 'pushState' : 'replaceState']({ section: id }, '', url);
+      if (push) history.pushState({ section: id }, '', url);
+      else nativeReplace({ section: id }, '', url);
     } catch (err) { /* address bar stays as-is; scrolling is unaffected */ }
   }
 
